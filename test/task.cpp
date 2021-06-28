@@ -29,10 +29,10 @@ int main() {
         co_return 10;
     };
 
-    task().resume();
+    // task().resume();
 
-//    auto do_task = [&]() -> coro::generator<int> {
-//        co_yield co_await task();
-//    }();
-//    do_task.move_next();
+    auto do_task = [&]() -> coro::generator<int> {
+        co_yield co_await task();
+    }();
+    do_task();
 }

@@ -1,8 +1,6 @@
 #pragma once
 
 #include "concepts.hpp"
-
-#include <coroutine>
 #include <exception>
 
 namespace coro {
@@ -118,7 +116,7 @@ struct coroutine_iterator {
         : coro(std::addressof(coro)) {}
 
     coroutine_iterator &operator++() {
-        coro->resume();
+        coro->move_next();
         return *this;
     }
 

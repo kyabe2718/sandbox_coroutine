@@ -1,5 +1,4 @@
-#include <coroutine>
-#include <exception>
+#pragma once
 
 #include "coro_base.hpp"
 #include <iostream>

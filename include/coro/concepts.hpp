@@ -1,14 +1,26 @@
 #pragma once
 
 #include <concepts>
+
+#if __has_include(<coroutine>)
 #include <coroutine>
+#elif __has_include(<experimental/coroutine>)
+#include <experimental/coroutine>
+namespace std {
+using namespace std::experimental;
+}
+#else
+#error cannot include the header for coroutine
+#endif
+
+
 namespace coro {
 
 template<typename T, typename... Ts>
 concept same_as_any_of = (std::same_as<T, Ts> || ...);
 
 template<typename T, typename... Ts>
-concept convertible_to_any_of = (std::convertible_to<T, Ts> || ...);
+concept convertible_to_any_of = (std::is_convertible_v<T, Ts> || ...);
 
 namespace detail {
 template<typename P>
