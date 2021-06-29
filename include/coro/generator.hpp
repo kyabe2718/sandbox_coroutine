@@ -1,6 +1,6 @@
 #pragma once
 
-#include "coro_base.hpp"
+#include "coro/utility/coro_base.hpp"
 
 #include <iostream>
 

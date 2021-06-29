@@ -1,21 +1,11 @@
-#include <coro/task.hpp>
 #include <coro/sync_wait.hpp>
+#include <coro/task.hpp>
 
 #include <chrono>
 #include <iostream>
 #include <thread>
 
 using namespace std::chrono_literals;
-
-//namespace coro {
-//template<typename Awaitable>
-//void sync_wait(Awaitable &&awaitable) {
-//    auto do_task = [&]() -> generator<int> {
-//        co_yield(co_await std::forward<Awaitable>(awaitable));
-//    }();
-//    do_task();
-//}
-//}// namespace coro
 
 #include <doctest/doctest.h>
 
@@ -39,8 +29,40 @@ TEST_CASE("task doesn't start until awaited") {
     }());
 }
 
-TEST_SUITE_END();
+TEST_CASE("awaiting default-constructed task throws broken_promise") {
+    coro::sync_wait([&]() -> coro::task<> {
+        coro::task<> t;
+        CHECK_THROWS_AS(co_await t, const coro::broken_promise &);
+    }());
+}
 
+TEST_CASE("task of reference type") {
+    int value = 3;
+    auto f = [&]() -> coro::task<int &> {
+        co_return value;
+    };
+
+    coro::sync_wait([&]() -> coro::task<> {
+        SUBCASE("awaiting rvalue task") {
+            decltype(auto) result = co_await f();
+            static_assert(
+                    std::is_same<decltype(result), int &>::value,
+                    "co_await r-value reference of task<int&> should result in an int&");
+            CHECK(&result == &value);
+        }
+
+        SUBCASE("awaiting lvalue task") {
+            auto t = f();
+            decltype(auto) result = co_await t;
+            static_assert(
+                    std::is_same<decltype(result), int &>::value,
+                    "co_await l-value reference of task<int&> should result in an int&");
+            CHECK(&result == &value);
+        }
+    }());
+}
+
+TEST_SUITE_END();
 
 //int main() {
 //    static_assert(coro::Awaitable<coro::task<void>>);

@@ -69,9 +69,9 @@ private:
 
 template<typename T>
 struct promise_base : promise_base<void> {
-    static_assert(std::is_default_constructible_v<T>);
 
     using value_type = std::remove_reference_t<T>;
+    static_assert(std::is_default_constructible_v<value_type>);
 
     using promise_base<void>::promise_base;
 
@@ -103,6 +103,26 @@ struct promise_base<T &> : promise_base<void> {
 private:
     std::add_pointer_t<value_type> data;
 };
+
+enum class return_type {
+    return_value,
+    return_void,
+};
+
+template<typename T, return_type = (std::is_void_v<typename T::base_type> ? return_type::return_void : return_type::return_value)>
+struct add_return_value_or_void;
+
+template<typename T>
+struct add_return_value_or_void<T, return_type::return_value> : T {
+    template<typename U>
+    void return_value(U &&v) { this->template set_value(std::forward<U>(v)); }
+};
+
+template<typename T>
+struct add_return_value_or_void<T, return_type::return_void> : T {
+    void return_void() {}
+};
+
 
 struct coroutine_iterator_end {};
 

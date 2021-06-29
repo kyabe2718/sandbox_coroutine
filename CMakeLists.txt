@@ -1,18 +1,19 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.0)
 project(sandbox_coroutine)
 
-#set(CMAKE_CXX_COMPILER g++-10)
-#set(CMAKE_C_COMPILER gcc-10)
-#add_compile_options(-std=c++20 -fcoroutines)
+set(CMAKE_CXX_COMPILER g++-10)
+set(CMAKE_C_COMPILER gcc-10)
+add_compile_options(-std=c++20 -fcoroutines)
 
-set(CMAKE_CXX_COMPILER clang++)
-set(CMAKE_C_COMPILER clang)
-add_compile_options(-std=c++20 -fcoroutines-ts -stdlib=libc++)
+#set(CMAKE_CXX_COMPILER clang++)
+#set(CMAKE_C_COMPILER clang)
+#add_compile_options(-std=c++20 -fcoroutines-ts -stdlib=libc++)
 
-set(CMAKE_CXX_FLAGS "-O0 -g3")
+set(CMAKE_CXX_FLAGS "-O2 -g3")
 
 add_library(coro INTERFACE)
 target_include_directories(coro INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+target_link_libraries(coro INTERFACE pthread)
 
 file(GLOB SANDBOX_SOURCES ${CMAKE_CURRENT_LIST_DIR}/sandbox/*.cpp)
 foreach (SOURCE ${SANDBOX_SOURCES})
