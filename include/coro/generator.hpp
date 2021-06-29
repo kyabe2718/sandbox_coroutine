@@ -11,7 +11,7 @@ struct generator;
 
 namespace detail {
 template<typename T>
-struct generator_promise_type : promise_base<T> {
+struct generator_promise_type final : promise_base<T> {
     static_assert(!std::is_same_v<T, void>);
 
     using base_type = promise_base<T>;
@@ -36,7 +36,7 @@ struct generator_promise_type : promise_base<T> {
 }// namespace detail
 
 template<typename T>
-struct generator : coroutine_base<detail::generator_promise_type<T>> {
+struct generator final : coroutine_base<detail::generator_promise_type<T>> {
     static_assert(!std::is_same_v<T, void>);
 
     using promise_type = detail::generator_promise_type<T>;

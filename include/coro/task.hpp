@@ -106,7 +106,7 @@ struct task : coroutine_base<detail::task_promise<T>> {
     auto operator co_await() const & {
         struct awaitable : awaitable_base {
             using awaitable_base::awaitable_base;
-            auto await_resume() { return this->m_coroutine.promise().result(); }
+            decltype(auto) await_resume() { return this->m_coroutine.promise().result(); }
         };
         return awaitable{this->handle};
     }
@@ -114,7 +114,7 @@ struct task : coroutine_base<detail::task_promise<T>> {
     auto operator co_await() const && {
         struct awaitable : awaitable_base {
             using awaitable_base::awaitable_base;
-            auto await_resume() { return std::move(this->m_coroutine.promise()).result(); }
+            decltype(auto) await_resume() { return std::move(this->m_coroutine.promise()).result(); }
         };
         return awaitable{this->handle};
     }
