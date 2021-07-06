@@ -78,13 +78,13 @@ decltype(auto) sync_wait(Awaitable &&awaitable) {
 
     using await_result_t = typename awaitable_traits<Awaitable>::await_result_type;
 
-    auto wait_task = [&awaitable]() -> detail::sync_wait_task<await_result_t, Sync> {
+    auto wait_task = [](auto&& awaitable) -> detail::sync_wait_task<await_result_t, Sync> {
         if constexpr (std::is_void_v<await_result_t>) {
-            co_await awaitable;
+            co_await std::forward<decltype(awaitable)>(awaitable);
         } else {
-            co_return co_await awaitable;
+            co_return co_await std::forward<decltype(awaitable)>(awaitable);
         }
-    }();
+    }(std::forward<Awaitable>(awaitable));
 
     wait_task.start();
 

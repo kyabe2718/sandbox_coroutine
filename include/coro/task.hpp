@@ -3,6 +3,7 @@
 #include "coro/utility/coro_base.hpp"
 #include "coro/utility/exception.hpp"
 
+#include <cassert>
 #include <iostream>
 
 namespace coro {
@@ -24,7 +25,9 @@ struct final_awaitable {
 
     template<typename P>
     auto await_suspend(std::coroutine_handle<P> handle) const noexcept {
-        return handle.promise().next;
+        auto next = handle.promise().next;
+        assert(next && "next handle is null");
+        return next;
     }
 
     auto await_resume() const noexcept {}
@@ -76,18 +79,18 @@ struct task : coroutine_base<detail::task_promise<T>> {
     using handle_type = typename base_type::handle_type;
     using base_type::base_type;
 
-    // taskがco_awaitで中断された時に使われるawaitable
+    // co_await t; とした時に使われるawaitable
+    // m_coroutine は t に対応するコルーチンハンドル
+    // m_coroutine の next に現在のコルーチンを格納し、代わりに m_coroutine を再開する
     struct awaitable_base {
         explicit awaitable_base(std::coroutine_handle<promise_type> handle) noexcept
             : m_coroutine(handle) {}
 
         auto await_ready() { return !m_coroutine || m_coroutine.done(); }
 
-        template<typename P>
-        auto await_suspend(std::coroutine_handle<P> coro) {
-            // m_coroutineが中断されたら再び今のcoroutineを再開してほしい
+        auto await_suspend(std::coroutine_handle<> coro) {
+            // m_coroutineが終了したら再び今のcoroutineを再開してほしい
             m_coroutine.promise().set_next(coro);
-
             return m_coroutine;
         }
 
