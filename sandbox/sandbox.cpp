@@ -5,9 +5,15 @@
 #include <coro/sync_wait.hpp>
 #include <coro/task.hpp>
 
-#include <thread>
+#include <boost/core/typeinfo.hpp>
 
-using namespace std::chrono_literals;
+namespace coro {
+struct runtime {
+};
+
+struct co_task {
+};
+}// namespace coro
 
 int main() {
 }

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "coro/utility/coro_base.hpp"
-#include "coro/utility/exception.hpp"
+#include "utility/coro_base.hpp"
+#include "utility/exception.hpp"
 
 #include <cassert>
 #include <iostream>
@@ -131,8 +131,5 @@ auto task_promise_base<T>::get_return_object() -> task<T> {
     using handle_type = typename task<T>::handle_type;
     return task<T>(handle_type::from_promise(static_cast<task_promise<T> &>(*this)));
 }
-
 }// namespace detail
-
-//static_assert(Awaiter<awaitable_to_awaiter_t<task<void>>>);
 }// namespace coro

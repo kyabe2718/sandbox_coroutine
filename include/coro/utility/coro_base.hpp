@@ -109,7 +109,12 @@ enum class return_type {
     return_void,
 };
 
-template<typename T, return_type = (std::is_void_v<typename T::base_type> ? return_type::return_void : return_type::return_value)>
+template<typename T>
+constexpr return_type value_or_void =
+        std::is_void_v<T> ? return_type::return_void
+                          : return_type::return_value;
+
+template<typename T, return_type>
 struct add_return_value_or_void;
 
 template<typename T>
@@ -122,7 +127,6 @@ template<typename T>
 struct add_return_value_or_void<T, return_type::return_void> : T {
     void return_void() {}
 };
-
 
 struct coroutine_iterator_end {};
 
