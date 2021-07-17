@@ -1,11 +1,16 @@
 #undef NDEBUG
 #include <cassert>
-#include <iostream>
 
+#include <coro/generator.hpp>
 #include <coro/sync_wait.hpp>
 #include <coro/task.hpp>
 
+#include <iostream>
+#include <thread>
+#include <vector>
+
 #include <boost/core/typeinfo.hpp>
+#include <boost/lockfree/queue.hpp>
 
 namespace coro {
 
@@ -60,29 +65,22 @@ auto detail::async_promise<T>::get_return_object() -> async<T> {
     return async<T>(handle_type::from_promise(*this));
 }
 
-struct thread_pool {
-    template<typename T>
-    void go(T &&task) {
-        std::cout << __PRETTY_FUNCTION__ << std::endl;
-    }
-};
 }// namespace coro
 
+using namespace std::chrono_literals;
+
+
 int main() {
-    coro::thread_pool scheduler;
 
-    //    coro::sync_wait([&]() -> coro::task<> {
-
-    auto func = []() -> coro::async<> {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        std::cout << __PRETTY_FUNCTION__ << std::endl;
-        co_return;
+    auto async_read = []() -> coro::task<std::string> {
+        std::this_thread::sleep_for(1s);
+        co_return "message";
     };
 
-    std::cout << "start" << std::endl;
-    scheduler.go(func());
-    std::cout << "end" << std::endl;
+    auto func = [&]() -> coro::task<> {
+        std::cout << __PRETTY_FUNCTION__ << std::endl;
+        std::cout << (co_await async_read()) << std::endl;
+    };
 
-    //        co_return;
-    //    }());
+    coro::sync_wait(func());
 }

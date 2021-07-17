@@ -1,6 +1,7 @@
 #pragma once
 
 #include "concepts.hpp"
+
 #include <exception>
 
 namespace coro {
@@ -31,6 +32,10 @@ struct coroutine_base {
     [[nodiscard]] bool done() const noexcept { return !handle or handle.done(); }
 
     explicit operator bool() const { return !done(); }
+
+    std::coroutine_handle<> get() const {
+        return handle;
+    }
 
 protected:
     coroutine_base() noexcept

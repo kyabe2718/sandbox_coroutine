@@ -9,7 +9,8 @@ add_compile_options(-std=c++20 -fcoroutines)
 #set(CMAKE_C_COMPILER clang)
 #add_compile_options(-std=c++20 -fcoroutines-ts -stdlib=libc++)
 
-set(CMAKE_CXX_FLAGS "-O2 -g3")
+set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g3")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2 -g")
 
 add_library(coro INTERFACE)
 target_include_directories(coro INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)

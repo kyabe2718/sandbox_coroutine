@@ -1,8 +1,6 @@
 #pragma once
 
-#include "coro/utility/coro_base.hpp"
-
-#include <iostream>
+#include "utility/coro_base.hpp"
 
 namespace coro {
 
